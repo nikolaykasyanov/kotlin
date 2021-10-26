@@ -1917,6 +1917,11 @@ class DeclarationsConverter(
                         source = typeRefSource
                         diagnostic = ConeSimpleDiagnostic("Intersection types are not supported yet", DiagnosticKind.Syntax)
                     }
+                CONTEXT_RECEIVER_LIST -> firType =
+                    buildErrorTypeRef {
+                        source = typeRefSource
+                        diagnostic = ConeSimpleDiagnostic("Context receivers are not supported yet", DiagnosticKind.Syntax)
+                    }
                 TokenType.ERROR_ELEMENT -> firType =
                     buildErrorTypeRef {
                         source = typeRefSource
