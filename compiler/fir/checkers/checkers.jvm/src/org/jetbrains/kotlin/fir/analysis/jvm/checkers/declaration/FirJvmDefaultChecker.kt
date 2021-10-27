@@ -37,7 +37,6 @@ object FirJvmDefaultChecker : FirBasicDeclarationChecker() {
         var defaultAnnotation: FirAnnotation? = null
 
         if (declaration is FirAnnotatedDeclaration) {
-            val isJvm6 = context.isJvm6()
             defaultAnnotation = declaration.getAnnotationByClassId(JVM_DEFAULT_CLASS_ID)
 
             if (defaultAnnotation != null) {
@@ -45,7 +44,7 @@ object FirJvmDefaultChecker : FirBasicDeclarationChecker() {
                 if (containingDeclaration !is FirClass || !containingDeclaration.isInterface) {
                     reporter.reportOn(defaultAnnotation.source, FirJvmErrors.JVM_DEFAULT_NOT_IN_INTERFACE, context)
                     return
-                } else if (isJvm6) {
+                } else if (context.isJvm6()) {
                     reporter.reportOn(defaultAnnotation.source, FirJvmErrors.JVM_DEFAULT_IN_JVM6_TARGET, "JvmDefault", context)
                     return
                 } else if (!jvmDefaultMode.isEnabled) {
@@ -55,7 +54,7 @@ object FirJvmDefaultChecker : FirBasicDeclarationChecker() {
             } else {
                 val annotation = declaration.getAnnotationByClassId(JVM_DEFAULT_NO_COMPATIBILITY_CLASS_ID)
                 if (annotation != null) {
-                    if (isJvm6) {
+                    if (context.isJvm6()) {
                         reporter.reportOn(
                             annotation.source,
                             FirJvmErrors.JVM_DEFAULT_IN_JVM6_TARGET,
