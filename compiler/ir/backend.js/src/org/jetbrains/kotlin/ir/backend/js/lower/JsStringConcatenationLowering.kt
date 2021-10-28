@@ -29,7 +29,6 @@ private class JsStringConcatenationTransformer(val context: CommonBackendContext
             // If the type is Long or a supertype of Long, we want to call toString() on values of that type.
             // See KT-39891
             if (this !is IrSimpleType) return false
-            isAny()
             return when (classifier.signature) {
                 IdSignatureValues.any, IdSignatureValues.comparable, IdSignatureValues.number, IdSignatureValues._long -> true
                 else -> false
