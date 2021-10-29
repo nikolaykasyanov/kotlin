@@ -214,6 +214,7 @@ enum class LanguageFeature(
     SuspendConversion(KOTLIN_1_6),
     ProhibitSuperCallsFromPublicInline(KOTLIN_1_6),
     ProhibitProtectedConstructorCallFromPublicInline(KOTLIN_1_6),
+    EnableKClassQualifiedName(KOTLIN_1_6, defaultState = State.ENABLED, kind = OTHER),
 
     // 1.7
 

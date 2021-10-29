@@ -237,6 +237,7 @@ class K2JSCompilerArguments : CommonCompilerArguments() {
 
     override fun configureLanguageFeatures(collector: MessageCollector): MutableMap<LanguageFeature, LanguageFeature.State> {
         return super.configureLanguageFeatures(collector).apply {
+            this[LanguageFeature.EnableKClassQualifiedName] = if (wasm) LanguageFeature.State.ENABLED else LanguageFeature.State.DISABLED
             if (extensionFunctionsInExternals) {
                 this[LanguageFeature.JsEnableExtensionFunctionInExternals] = LanguageFeature.State.ENABLED
             }
