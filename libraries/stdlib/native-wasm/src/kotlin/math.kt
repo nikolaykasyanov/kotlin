@@ -54,12 +54,18 @@ public actual val Double.sign: Double get() = sign(this)
 @SinceKotlin("1.2")
 public actual fun Double.roundToInt(): Int = when {
     isNaN() -> throw IllegalArgumentException("Cannot round NaN value.")
-    this > Int.MAX_VALUE -> Int.MAX_VALUE
-    this < Int.MIN_VALUE -> Int.MIN_VALUE
     else -> {
-        // Adding 0.5 first can cross a rounding boundary or change an integral value.
-        val floored = floor(this)
-        (if (this - floored >= 0.5) floored + 1.0 else floored).toInt()
+        val whole = this.toInt()
+        // If `whole` is an Int endpoint, `this` is at or beyond that, therefore rounding and saturation return `whole`.
+        if (whole == Int.MAX_VALUE || whole == Int.MIN_VALUE) return whole
+        // Here and in below methods of the same family, the subtraction is exact by Sterbenz lemma when `whole != 0`,
+        // and trivial when `whole == 0`.
+        val fraction = this - whole
+        whole + when {
+            fraction >= 0.5 -> 1
+            fraction < -0.5 -> -1
+            else -> 0
+        }
     }
 }
 
@@ -77,11 +83,19 @@ public actual fun Double.roundToInt(): Int = when {
 @SinceKotlin("1.2")
 public actual fun Double.roundToLong(): Long = when {
     isNaN() -> throw IllegalArgumentException("Cannot round NaN value.")
-    this > Long.MAX_VALUE -> Long.MAX_VALUE
-    this < Long.MIN_VALUE -> Long.MIN_VALUE
     else -> {
-        val floored = floor(this)
-        (if (this - floored >= 0.5) floored + 1.0 else floored).toLong()
+        val whole = this.toLong()
+        // Doubles with magnitude at least 2^52 are already integral. This condition also checks for saturation because 2^63 > 2^52.
+        if (whole >= 9_007_199_254_740_992L || whole <= -9_007_199_254_740_992L) {
+            whole
+        } else {
+            val fraction = this - whole
+            whole + when {
+                fraction >= 0.5 -> 1
+                fraction < -0.5 -> -1
+                else -> 0
+            }
+        }
     }
 }
 
@@ -170,12 +184,19 @@ public actual val Float.sign: Float
 @SinceKotlin("1.2")
 public actual fun Float.roundToInt(): Int = when {
     isNaN() -> throw IllegalArgumentException("Cannot round NaN value.")
-    this > Int.MAX_VALUE -> Int.MAX_VALUE
-    this < Int.MIN_VALUE -> Int.MIN_VALUE
     else -> {
-        // Adding 0.5 first can cross a rounding boundary or change an integral value.
-        val floored = floor(this)
-        (if (this - floored >= 0.5f) floored + 1.0f else floored).toInt()
+        val whole = this.toInt()
+        // Floats with magnitude at least 2^23 are already integral. This condition also checks for saturation because 2^31 > 2^23.
+        if (whole >= 8_388_608 || whole <= -8_388_608) {
+            whole
+        } else {
+            val fraction = this - whole
+            whole + when {
+                fraction >= 0.5f -> 1
+                fraction < -0.5f -> -1
+                else -> 0
+            }
+        }
     }
 }
 
@@ -193,11 +214,19 @@ public actual fun Float.roundToInt(): Int = when {
 @SinceKotlin("1.2")
 public actual fun Float.roundToLong(): Long = when {
     isNaN() -> throw IllegalArgumentException("Cannot round NaN value.")
-    this > Long.MAX_VALUE -> Long.MAX_VALUE
-    this < Long.MIN_VALUE -> Long.MIN_VALUE
     else -> {
-        val floored = floor(this)
-        (if (this - floored >= 0.5f) floored + 1.0f else floored).toLong()
+        val whole = this.toLong()
+        // Floats with magnitude at least 2^23 are already integral. This condition also checks for saturation because 2^63 > 2^23.
+        if (whole >= 8_388_608L || whole <= -8_388_608L) {
+            whole
+        } else {
+            val fraction = this - whole
+            whole + when {
+                fraction >= 0.5f -> 1
+                fraction < -0.5f -> -1
+                else -> 0
+            }
+        }
     }
 }
 
