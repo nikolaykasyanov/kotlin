@@ -595,8 +595,7 @@ external private fun Double.signBit(): Boolean
 @SinceKotlin("1.2")
 public actual fun Double.roundToInt(): Int = when {
     isNaN() -> throw IllegalArgumentException("Cannot round NaN value.")
-    this > Int.MAX_VALUE -> Int.MAX_VALUE
-    this < Int.MIN_VALUE -> Int.MIN_VALUE
+    abs(this) >= 2147483648.0 -> if (this > 0.0) Int.MAX_VALUE else Int.MIN_VALUE
     else -> {
         // Even though `this - floor(this)` is not guaranteed to be exact when `-0.5 < x < 0` (see Sterbenz lemma), it does not matter when
         // ties are resolved towards positive infinity, because:
@@ -604,7 +603,8 @@ public actual fun Double.roundToInt(): Int = when {
         // - hence the result of the above subtraction, `d`, is `0.5 < d < 1.0` and cannot be rounded to anything below 0.5 because 0.5 is
         // exactly representable.
         val floored = floor(this)
-        (if (this - floored >= 0.5) floored + 1.0 else floored).toInt()
+        val whole = floored.toInt()
+        if (whole == Int.MAX_VALUE) whole else whole + if (this - floored >= 0.5) 1 else 0
     }
 }
 
@@ -622,12 +622,11 @@ public actual fun Double.roundToInt(): Int = when {
 @SinceKotlin("1.2")
 public actual fun Double.roundToLong(): Long = when {
     isNaN() -> throw IllegalArgumentException("Cannot round NaN value.")
-    this > Long.MAX_VALUE -> Long.MAX_VALUE
-    this < Long.MIN_VALUE -> Long.MIN_VALUE
+    abs(this) >= -Long.MIN_VALUE.toDouble() -> if (this > 0.0) Long.MAX_VALUE else Long.MIN_VALUE
     else -> {
         val floored = floor(this)
         // See the comment in Double.roundToInt().
-        (if (this - floored >= 0.5) floored + 1.0 else floored).toLong()
+        floored.toLong() + if (this - floored >= 0.5) 1L else 0L
     }
 }
 
